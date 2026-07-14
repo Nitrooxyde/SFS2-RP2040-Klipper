@@ -1,0 +1,19 @@
+# FreeCAD backups / locks
+*.FCBak
+*.FCStd1
+.xdp-*
+*~
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Klipper build artifacts (if you drop a build here)
+firmware/out/
+*.o
+*.elf
+
+# Editor
+.vscode/
+.idea/
