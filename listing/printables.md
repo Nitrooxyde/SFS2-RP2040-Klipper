@@ -4,7 +4,7 @@
 > Images: `docs/img/receptacle-pico-cavity.jpg`, `docs/img/receptacle-usbc-opening.jpg`
 > **+ recommended: 2–3 real photos** (printed part, module mounted on the 2020, wiring) — real photos massively boost downloads.
 > Category: **3D Printers → Printer Accessories**
-> License: pick in the dropdown (suggestion: **CC BY 4.0**, consistent with the MIT repo)
+> License: pick **"Creative Commons — Attribution"** in the dropdown (= CC BY; the "4.0" version number isn't shown; consistent with the MIT repo). Alternative if you want to forbid others selling it: "Creative Commons — Attribution — NonCommercial".
 
 ---
 

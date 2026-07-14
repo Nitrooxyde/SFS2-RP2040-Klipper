@@ -4,7 +4,7 @@
 > Images : `docs/img/receptacle-pico-cavity.jpg`, `docs/img/receptacle-usbc-opening.jpg`
 > **+ recommandé : 2–3 photos réelles** (pièce imprimée, module monté sur le 2020, câblage) — les photos réelles font ×3 sur les téléchargements.
 > Catégorie : **Outil → Accessoires pour imprimante 3D**
-> Prix : Gratuit (suggestion) · Licence : à choisir (suggestion : CC BY 4.0 — cohérent avec le repo MIT)
+> Prix : Gratuit (suggestion) · Licence : **« CC - Attribution »** dans leur menu (= CC BY, le « 4.0 » n'est pas affiché ; cohérent avec le repo MIT). Alternative si tu veux interdire la vente par d'autres : « CC - Attribution - Pas d'utilisation commerciale ».
 
 ---
 
