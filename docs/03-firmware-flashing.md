@@ -38,7 +38,10 @@ make            # produces out/klipper.uf2 (and out/klipper.bin for Katapult)
 2. Copy the UF2 to it:
    - Katapult first (recommended): flash `katapult.uf2`, then flash Klipper via
      Katapult (below), **or**
-   - Klipper directly: copy `out/klipper.uf2` onto `RPI-RP2`.
+   - Klipper directly (no Katapult): **rebuild with Bootloader offset =
+     `No bootloader`**, then copy `out/klipper.uf2` onto `RPI-RP2`. (A 16 KiB‑offset
+     build copied to a bare board will not boot — there is nothing at the start of
+     flash.)
 
 ### Katapult (so you never need BOOT again)
 
@@ -52,23 +55,31 @@ device: `/dev/serial/by-id/usb-katapult_rp2040_XXXX-if00`.
 `make menuconfig` → RP2040, **Bootloader offset = 16 KiB**, **USB** → `make`
 (produces `out/klipper.bin`, which is what Katapult flashes — not the `.uf2`).
 
-**Step 3 — flash Klipper through Katapult** (from `~/klipper`, so the default
-`out/klipper.bin` is picked up):
+**Step 3 — flash Klipper through Katapult** (flashtool defaults to
+`~/klipper/out/klipper.bin` wherever you run it from; use `-f` to point elsewhere):
 ```bash
-cd ~/klipper
 python3 ~/katapult/scripts/flashtool.py -d /dev/serial/by-id/usb-katapult_rp2040_XXXX-if00
 ```
 The board reboots into Klipper and now shows up as
 `usb-Klipper_rp2040_XXXX-if00`.
 
-**Later reflashes — no BOOT button.** With Klipper already running, point flashtool at
-the **Klipper** serial and add `-r`: flashtool asks the running MCU to reboot into
-Katapult, then flashes:
+**Later reflashes — no BOOT button, two steps.** With Klipper already running:
+
 ```bash
 cd ~/klipper && make
+
+# 1) ask the running Klipper MCU to reboot into Katapult (request only — exits)
 python3 ~/katapult/scripts/flashtool.py \
     -d /dev/serial/by-id/usb-Klipper_rp2040_5303284738FB5E1C-if00 -r
+
+# 2) the board re-enumerates as usb-katapult_rp2040_XXXX-if00 — flash through THAT
+python3 ~/katapult/scripts/flashtool.py \
+    -d /dev/serial/by-id/usb-katapult_rp2040_XXXX-if00
 ```
+
+> `-r` only *requests* the bootloader and exits; over USB the board comes back under a
+> **different serial** (`usb-katapult_…`), so the flash itself is always the second
+> command. (One‑shot request+flash exists only for CAN devices, not USB.)
 
 ## Identify the board's serial (critical — 3rd RP2040 on the rig)
 
@@ -76,8 +87,8 @@ Three RP2040s share the same VID:PID. **Never** assume which `/dev/serial/by-id/
 entry is the SFS Pico.
 
 ```bash
-# map every declared serial across all Klipper configs first
-grep -rE 'serial' ~/printer_data/config/ | grep -v '^\s*#'
+# map every declared (uncommented) serial across all Klipper configs first
+grep -rE '^\s*serial:' ~/printer_data/config/
 ```
 
 To positively identify the SFS Pico when several RP2040s are plugged:

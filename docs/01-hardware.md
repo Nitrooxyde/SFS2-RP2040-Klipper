@@ -9,7 +9,7 @@
 | 1 | Printed receptacle | `cad/REC_body_v1.stl` — houses both parts as one piece. |
 | 2 | **PC4‑M6** pneumatic fittings | Supplied with the SFS; one at each filament port. |
 | 1 | **PTFE tube ID2 / OD4** | **Mandatory** guide into the SFS bore (see below). |
-| 2 | M3 screws | Fix the receptacle to the SFS mounting face (self‑tapping into the SFS). |
+| 2 | **M3×12 button‑head** screws | Fix the receptacle to the SFS mounting face (self‑tapping into the SFS). The receptacle's counterbores are sized for button heads; the M3×6 supplied by BTT are too short through the receptacle. |
 | 2 | M3 screws + T‑nuts | Fix the receptacle's tab to a 2020 extrusion. |
 | 1 | USB‑C cable | RP2040‑Zero → Raspberry Pi. |
 | — | Dupont / JST‑to‑bare wiring | SFS's two 3‑pin leads → RP2040‑Zero pads. |
@@ -25,7 +25,8 @@ BTT STEP == BTT manual (`SFS V2.0 …_20231123.pdf`).
 
 ### Mechanical
 - **Body:** X 53.5 · Y 30.3 · Z 27.3 mm (BTT official: 53.1 × 30.3 × 27.3). ~36 g.
-- **Mounting face:** the large 53 × 27 face (normal +Y, area ≈ 1054 mm²).
+- **Mounting face:** the large 53 × 27 face (normal +Y; net measured face area
+  ≈ 1054 mm² — less than 53 × 27 because of the cutouts in the face).
 - **3× M3 self‑tapping holes** in that face (pilot Ø2.7, head counterbore ≈ Ø5,
   blind into the plastic — **no inserts**; BTT supplies 3× M3×6):
 
@@ -104,7 +105,7 @@ bundled here to keep the repo lean).
 This Pico is the **third** RP2040 Klipper MCU on the printer (after the **BTT Eddy**
 and the **Fysetc PIS**). All three share VID:PID `1d50:614e` (Manufacturer "Klipper",
 Product "rp2040"). **Always identify each board by its unique serial** before editing
-a `[mcu …]` block — see [docs/03](docs/03-firmware-flashing.md).
+a `[mcu …]` block — see [docs/03](03-firmware-flashing.md).
 
 Known serials on the reference rig:
 - Octopus Pro (STM32): `usb-Klipper_stm32f446xx_300025001350324E31333220-if00`

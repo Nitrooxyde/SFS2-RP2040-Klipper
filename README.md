@@ -1,4 +1,4 @@
-# SFS 2.0 + RP2040‑Zero — Post‑Y Filament Sensor for Klipper
+# BTT SFS 2.0 + RP2040‑Zero — Standalone USB Filament Sensor for Klipper
 
 ![Klipper](https://img.shields.io/badge/Klipper-USB%20MCU-orange)
 ![MCU](https://img.shields.io/badge/MCU-RP2040--Zero-green)
@@ -6,40 +6,44 @@
 ![Status](https://img.shields.io/badge/status-functional-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-A **plug‑and‑play, single‑USB post‑extruder filament sensor** for Voron / Klipper
-setups: a **BigTreeTech Smart Filament Sensor (SFS) 2.0** read by a
-**Waveshare RP2040‑Zero** flashed as a standard **Klipper USB MCU**, housed in a
-**custom one‑piece printed receptacle**.
+A **self‑contained, plug‑and‑play filament sensor module** for any Klipper printer:
+a **BigTreeTech Smart Filament Sensor (SFS) 2.0** read by a **Waveshare RP2040‑Zero**
+flashed as a standard **Klipper USB MCU**, both housed in a **one‑piece printed
+receptacle**. One USB cable in, two native Klipper sensor objects out.
 
-The SFS exposes two signals — a **runout switch** (filament present / absent) and a
-**motion encoder** (~1 pulse / 2.88 mm of filament travel). The RP2040‑Zero turns
-both into native Klipper objects over a single USB cable:
+The SFS 2.0 exposes two signals — a **runout switch** (filament present / absent) and
+a **motion encoder** (~1 pulse / 2.88 mm of filament travel). The RP2040‑Zero turns
+both into first‑class Klipper objects:
 
-- `[filament_switch_sensor sfs_switch]` → presence on the common trunk
-- `[filament_motion_sensor sfs_motion]` → clog / slip / no‑movement detection
-
-No extra wiring to the main board, no free GPIO required on the toolhead MCU —
-the sensor is its own little USB microcontroller. This is the **post‑Y sensor**
-of a larger multi‑lane / endless‑spool architecture (see *The bigger picture*).
+- `[filament_switch_sensor sfs_switch]` → filament presence
+- `[filament_motion_sensor sfs_motion]` → movement / no‑movement (clog, slip)
 
 ---
 
-## Why this exists
+## Why a dedicated USB MCU for a filament sensor?
 
-The mechanical drive (Orbiter) and the buffer (Mellow LLL Plus) can tell you a lot,
-but neither can reliably answer *“is filament actually moving through the hotend
-feed path, right now?”* after the Y‑junction. A dedicated **motion encoder placed
-post‑Y, close to the extruder** is the honest discriminator between **“it advances”**
-and **“it slips”** — precisely the signal needed to:
+The usual way to wire an SFS is two signal lines back to the main board. Giving the
+sensor **its own $3 microcontroller on USB** instead has real advantages:
 
-- pause on a real runout / clog instead of air‑printing,
-- confirm which lane is actually feeding during an endless‑spool swap,
-- validate load / unload sequences (the motion signal moves even when the switch
-  sensor is `ENABLE=0`, verified in Klipper source).
+- **Zero pins needed** on your main or toolhead board — useful when they're full,
+  or when you don't want to run signal wires across the printer.
+- **Plug‑and‑play** — one USB cable. Move the module between machines, or add it to
+  a printer that was never wired for it.
+- **Electrically self‑contained** — the SFS is powered from the Pico's 3V3 pin;
+  no shared rails, no level‑shifting questions.
+- **A single printed part** — sensor + MCU + mounting = one module on a 2020
+  extrusion.
 
-Doing it on its own RP2040‑Zero over USB keeps the whole thing **full‑USB and
-plug‑and‑play**, consistent with the rest of the rig (Eddy, LLL Plus, EBB — all USB
-or CAN MCUs).
+What you do with the two signals is up to your config — they are ordinary Klipper
+sensor objects:
+
+- **pause on runout** (`pause_on_runout: True` when you're ready),
+- **clog / jam detection** — extruder commanded to move, encoder says nothing moves,
+- **slip / under‑extrusion detection** — commanded‑vs‑wheel differential,
+- **feed verification inside your own macros** — the motion state keeps updating
+  even when the sensor is disabled (verified in Klipper source), which makes it a
+  clean *“is filament actually moving?”* probe for any custom automation
+  (multi‑material feeds, load/unload sequences, whatever you build).
 
 ---
 
@@ -50,11 +54,11 @@ or CAN MCUs).
 | [`docs/01-hardware.md`](docs/01-hardware.md) | SFS 2.0 + RP2040‑Zero specs, verified dimensions, BOM |
 | [`docs/02-wiring.md`](docs/02-wiring.md) | SFS → Pico wiring, **the 3V3 rule**, pin map |
 | [`docs/03-firmware-flashing.md`](docs/03-firmware-flashing.md) | Building & flashing Klipper on the RP2040‑Zero (Katapult) |
-| [`docs/04-klipper-integration.md`](docs/04-klipper-integration.md) | `printer.cfg` blocks, safe bring‑up, usage & macros |
+| [`docs/04-klipper-integration.md`](docs/04-klipper-integration.md) | `printer.cfg` blocks, safe bring‑up, usage |
 | [`docs/05-cad-bracket.md`](docs/05-cad-bracket.md) | The printed receptacle: features, print settings, source |
 | [`klipper/sfs.cfg`](klipper/sfs.cfg) | Ready‑to‑`[include]` Klipper config snippet |
-| [`cad/REC_body_v1.stl`](cad/) | Print‑ready one‑piece receptacle (SFS 2.0 + RP2040‑Zero) |
-| [`cad/SFS20_Support_V2.FCStd`](cad/) | FreeCAD source of the receptacle |
+| [`cad/REC_body_v1.stl`](cad/REC_body_v1.stl) | Print‑ready one‑piece receptacle (SFS 2.0 + RP2040‑Zero) |
+| [`cad/SFS20_Support_V2.FCStd`](cad/SFS20_Support_V2.FCStd) | FreeCAD source of the receptacle |
 | [`firmware/`](firmware/) | Notes on the stock‑Klipper RP2040 build (no custom C) |
 
 ---
@@ -67,8 +71,8 @@ or CAN MCUs).
    ([docs/03](docs/03-firmware-flashing.md)).
 3. **Wire** SFS → Pico: **VCC → 3V3 (never 5V)**, GND → GND, motion → **GP0**,
    switch → **GP1** ([docs/02](docs/02-wiring.md)).
-4. **Add** the config below to `printer.cfg` (or `[include klipper/sfs.cfg]`),
-   fix the serial to *your* board, `FIRMWARE_RESTART`.
+4. **Add** the config below to `printer.cfg` (or copy `klipper/sfs.cfg` next to it
+   and `[include sfs.cfg]`), fix the serial to *your* board, `FIRMWARE_RESTART`.
 
 ```ini
 [mcu sfs]
@@ -93,33 +97,26 @@ pause_on_runout: False
 
 ---
 
-## The bigger picture — multi‑lane without a selector
+## Placement
 
-This sensor is one brick of a larger goal: **multicolor / multi‑material on a single
-direct‑drive toolhead without a selector MMU** — no ERCF, no BoxTurtle, no AMS.
-One **Mellow LLL Plus** buffer per lane, a passive splitter, Klipper orchestrating
-roles, and — after the Y‑junction — **this SFS** as the single source of truth for
-*“filament is moving”*.
-
-In that architecture the SFS enables the **endless‑spool 2‑sensor handshake**:
-the **LLL entrance sensor** arms a successor lane on runout, and the **post‑Y SFS
-motion** confirms the queue has passed the Y and executes / validates the swap.
-
-Related work in the rig:
-- **Mellow FLY LLL Buffer Plus** — canonical Klipper MCU firmware (autonomous
-  auto‑feed + full host control).
-- Passive splitter, per‑lane roles, `[filament_switch_sensor lll_entrance]`, `O2_sensor`.
+Anywhere on the filament path — that's the point of a self‑contained module. One
+practical rule: **the closer to the extruder, the less slack** between the encoder
+wheel and the drive gear, so the tighter `detection_length` can be and the earlier a
+real clog or runout is flagged. And fit the **PTFE ID2/OD4 guide all the way into the
+SFS bore on both ports** — without it, pushed filament buckles at the junction
+(empirically confirmed; see [docs/01](docs/01-hardware.md)).
 
 ---
 
 ## Status
 
-**Functional.** The receptacle prints and fits; the RP2040‑Zero runs stock Klipper
-over USB (Katapult in place, no BOOT button needed for reflash); both sensor objects
-come up in Klipper with the SFS powered at 3V3. The bracket can still be *complemented*
-(pico Y‑retention, optional flush lip) but is a working part.
+**Functional.** Built and running on a Voron 2.4: the receptacle prints and fits, the
+RP2040‑Zero runs stock Klipper over USB (Katapult in place — no BOOT button needed for
+reflash), and both sensor objects run in Klipper with the SFS powered at 3V3. The
+bracket still has a few optional refinements open (pico Y‑retention, flush lip) but
+is a working part.
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the full build history.
+See [`CHANGELOG.md`](CHANGELOG.md) for the build history.
 
 ---
 

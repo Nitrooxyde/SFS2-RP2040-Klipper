@@ -5,8 +5,10 @@
 1. **VCC = 3.3 V. Never 5 V.**
    The RP2040 is not 5 V‑tolerant (abs max ≈ 3.8 V). The SFS is rated 3.3–5 V and
    works fine at 3.3 V, so powering it from the Pico's **3V3** pin caps every signal
-   at 3.3 V → safe by construction. 5 V on VCC would drive the motion/switch outputs
-   to 5 V and **destroy the Pico's GPIO**.
+   at 3.3 V → **safe regardless of the output topology**. That matters because the
+   topology is not officially documented: if the outputs turn out to be push‑pull (or
+   internally pulled up to VCC), powering at 5 V puts 5 V on the signal lines and
+   **destroys the Pico's GPIO**. At 3.3 V nothing on the module can exceed 3.3 V.
 2. **Internal pull‑ups on both signal pins** (`^` in Klipper).
    The SFS outputs are open‑collector / switch‑to‑ground. Without a pull‑up they
    float and read garbage.
@@ -26,14 +28,14 @@
 > UART0 is free — they are used purely as digital inputs with pull‑up.
 
 ```
-   BTT SFS 2.0                         RP2040-Zero (USB)
- ┌──────────────┐                    ┌──────────────────┐
- │  motion  ────┼── GREEN ──────────►│ GP0  (^sfs:gpio0)│
- │  switch  ────┼── BLUE  ──────────►│ GP1  (^sfs:gpio1)│
- │  VCC     ────┼── RED   ──────────►│ 3V3   ⚠ NOT 5V    │
- │  GND     ────┼── BLACK ──────────►│ GND              │
- └──────────────┘                    │ USB-C ──► Raspberry Pi
-                                      └──────────────────┘
+   BTT SFS 2.0                        RP2040-Zero (USB)
+ ┌──────────────┐                    ┌───────────────────┐
+ │  motion  ────┼── GREEN ──────────►│ GP0  (^sfs:gpio0) │
+ │  switch  ────┼── BLUE  ──────────►│ GP1  (^sfs:gpio1) │
+ │  VCC     ────┼── RED   ──────────►│ 3V3  (! NOT 5V)   │
+ │  GND     ────┼── BLACK ──────────►│ GND               │
+ └──────────────┘                    │ USB-C ──► to Pi   │
+                                     └───────────────────┘
 ```
 
 The SFS's Y‑cable ends in **two 3‑pin** connectors (motion group and switch group),
@@ -54,7 +56,7 @@ not 5 V‑tolerant:
    - ≈ VCC (push‑pull) = only safe because VCC is 3.3 V; would be fatal at 5 V.
 3. Connect GREEN → GP0, BLUE → GP1.
 4. Bring the sensor up in Klipper with `pause_on_runout: False` and just watch the
-   state in Mainsail (see [docs/04](docs/04-klipper-integration.md)) before arming
+   state in Mainsail (see [docs/04](04-klipper-integration.md)) before arming
    any auto‑pause.
 
 > **Cross‑check the wire colours against your actual cable** — colour conventions can

@@ -27,7 +27,10 @@ Full flashing + Katapult + serial‑identification steps are in
 ## Reference board
 
 - Serial: `usb-Klipper_rp2040_5303284738FB5E1C-if00`
-- Katapult installed → future updates: `make` + `flashtool.py -d <serial>` (no button).
+- Katapult installed → future updates, no button, **two steps**: `make`, then
+  `flashtool.py -d <klipper-serial> -r` (reboots the MCU into Katapult), then
+  `flashtool.py -d <katapult-serial>` to flash — see
+  [`../docs/03-firmware-flashing.md`](../docs/03-firmware-flashing.md).
 
 > If you want a fully reproducible build, drop the Klipper `out/klipper.config`
 > here and note the Klipper commit you built from.

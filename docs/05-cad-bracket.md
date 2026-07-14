@@ -1,7 +1,7 @@
 # 05 — The printed receptacle
 
 A **one‑piece receptacle** that holds the **SFS 2.0** and the **RP2040‑Zero** together
-and mounts to a **2020 extrusion** — so the whole post‑Y sensor is a single printed
+and mounts to a **2020 extrusion** — so the whole sensor module is a single printed
 part with one USB cable leaving it.
 
 - **Print file:** [`cad/REC_body_v1.stl`](../cad/REC_body_v1.stl)
@@ -20,7 +20,7 @@ part with one USB cable leaving it.
 
 - **RP2040‑Zero cavity** at the −X end, USB‑C exposed through an opening cut to the
   **real connector contour** (obround; the tight axis is the ~3.4 mm connector
-  height — see note below).
+  height — see *Known‑open items* below).
 - **2× M6 filament ports** matching the SFS bore, for the PC4‑M6 fittings.
   → Run the **PTFE ID2/OD4** guide all the way into the SFS bore on both
   (see [docs/01](01-hardware.md)).
@@ -47,18 +47,22 @@ This is a functional structural bracket, so print it strong:
 | Layer height | 0.2 mm |
 | Walls / perimeters | **4** (wall count is the real strength lever, not layer height) |
 | Infill | 30–40 % |
-| Supports | Only where the USB‑C / port / button openings overhang, depending on
-  orientation |
+| Supports | Only where the USB‑C / port / button openings overhang, depending on orientation |
 
 > Orientation is not prescriptive — pick the face that puts the mounting tab and the
 > filament ports on clean surfaces and minimises support inside the pico cavity.
 
-## Known‑open / can be complemented
+## Known‑open items / optional refinements
 
-The part is **functional** but was left with a few optional refinements never forced:
+The part is **functional**; a few optional refinements were deliberately left open:
 
 - **Pico Y‑retention** — the cavity is open; the RP2040 is held by the wall + USB‑C,
   add a clip/lid if you want positive retention.
+- **USB‑C opening clearance** — the truly tight axis is the **connector height**
+  (~3.4 mm opening vs ~3.16 mm connector, ≈0.2 mm play); the long axis is already
+  ~2× the connector width. If your cable's overmold binds, open the *height* axis
+  slightly in the source (an earlier tweak widened the long axis, which changes
+  nothing — see `CHANGELOG.md`, 07‑04).
 - **−Y mouth flush lip** — a ~0.01 mm residual skin (1/20 of a layer, not sliced) was
   left because OCC refused a perfectly coincident cut; reconstruct the −Y face as a
   separate parametric frame if you want a geometric flush.

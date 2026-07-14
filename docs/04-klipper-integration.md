@@ -38,13 +38,25 @@ Points to get right:
   then every **0.25 s** checks whether the extruder passed that target **without** a new
   pulse. If it did → no‑movement → runout event. So the signal is a **debounced proxy**:
   confirmation arrives within the next few mm of extrusion, not at the exact instant.
-  Placed **post‑Y, close to the Orbiter**, there is little slack, so it is far more
-  reliable than a sensor upstream of the whole bowden.
+  **Mount the sensor close to the extruder** when you can: the less slack between the
+  encoder wheel and the drive gear, the tighter `detection_length` can be and the
+  earlier a real no‑movement condition is flagged.
 
-> The motion sensor's `filament_detected` updates **even when the sensor is
-> `ENABLE=0`** (verified in Klipper source: the pulse count updates before the enabled
-> check). That is what makes `sfs_motion` a usable *“it slips vs it advances”*
-> discriminator during manual load/unload jogs.
+> The motion sensor's `filament_detected` state updates **even when the sensor is
+> `ENABLE=0`** (in Klipper's source, `RunoutHelper.note_filament_present()` records
+> the state *before* the `sensor_enabled` gate — only runout/insert **event
+> processing** is disabled). That is what makes `sfs_motion` a usable
+> *“it slips vs it advances”* probe during manual feed jogs.
+>
+> **Two limits to know** (per Klipper's implementation):
+> - The **no‑movement check is forward‑only**: it flags when the extruder position
+>   passes *last pulse position + `detection_length`*. During a **retract/unload**
+>   the position moves backwards and never passes the target, so `filament_detected`
+>   will not go False from lack of wheel movement — for unload verification, watch the
+>   **pulse‑driven transitions** (each encoder pulse re‑asserts presence) instead.
+> - Moves must go **through the extruder** (`G1 E…` while the printer is in the
+>   *Printing* idle state). `FORCE_MOVE` neither triggers the check nor updates the
+>   tracked extruder position.
 
 ## Safe bring‑up, then arm
 
@@ -70,8 +82,8 @@ Points to get right:
 
    Or in the Mainsail console / status panel.
 4. When wiring, polarity and `detection_length` are validated, **arm** it by setting
-   `pause_on_runout: True` (or wiring the sensor into your endless‑spool / AFC macros
-   instead of a raw pause).
+   `pause_on_runout: True` — or point `runout_gcode` at your own macros instead of a
+   raw pause.
 
 ## Deploy checklist (Voron / Pi hygiene)
 
@@ -80,16 +92,21 @@ Points to get right:
 - **Confirm `print_stats.state == 'standby'`** before `FIRMWARE_RESTART`.
 - Never restart the machine mid‑print to add the sensor.
 
-## Role in the bigger system
+## What to build on top
 
-`sfs_motion` is the post‑Y *“filament is moving”* truth for:
-- **runout / clog** → pause instead of air‑printing,
-- **endless‑spool 2‑sensor handshake** — the LLL entrance sensor arms a successor lane
-  on runout; the post‑Y SFS motion confirms the queue passed the Y and validates which
-  lane is feeding,
-- **load / unload validation** — the discriminator between advancing and slipping.
+The two objects are ordinary Klipper sensors — use them for whatever your setup needs:
+
+- **runout → pause** — the classic use (`pause_on_runout: True` once validated),
+- **clog / jam detection** — extruder commanded to move, encoder reports no movement,
+- **slip / under‑extrusion detection** — commanded‑vs‑wheel differential,
+- **feed verification in custom macros** — `sfs_motion`'s state keeps updating even
+  when the sensor is `ENABLE=0`, so any automation (load/unload sequences,
+  multi‑material feeds, …) can query *“is filament actually moving?”* without arming
+  runout side effects. Mind the two limits above: no‑movement detection is
+  **forward‑only** (during retracts, watch pulse‑driven transitions instead), and
+  only extruder‑driven moves count.
 
 > **Note on metering:** the SFS does **not** count meters. Klipper accumulates nothing
 > from it (the wheel is ~1 pulse / 2.88 mm and slips), so real consumption still comes
-> from `print_stats.filament_used` / Spoolman. The SFS's unique value is the
+> from `print_stats.filament_used` (or a spool manager). The SFS's unique value is the
 > *commanded‑vs‑wheel differential* → detect slip / under‑extrusion.
