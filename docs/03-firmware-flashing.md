@@ -41,18 +41,34 @@ make            # produces out/klipper.uf2 (and out/klipper.bin for Katapult)
    - Klipper directly: copy `out/klipper.uf2` onto `RPI-RP2`.
 
 ### Katapult (so you never need BOOT again)
-Build Katapult for RP2040 (USB, 16 KiB), flash `katapult.uf2` once by the BOOT‑button
-method above, then flash Klipper through it:
 
+**Step 1 — flash Katapult once (BOOT‑button method).**
+Build Katapult for the RP2040 (`~/katapult`, `make menuconfig` → RP2040, communication
+**USB**), then put the Pico in RPI‑RP2 mode (hold BOOT, plug USB) and copy
+`out/katapult.uf2` onto the `RPI-RP2` drive. The board now enumerates as a Katapult
+device: `/dev/serial/by-id/usb-katapult_rp2040_XXXX-if00`.
+
+**Step 2 — build Klipper with the 16 KiB offset** (so it sits after Katapult):
+`make menuconfig` → RP2040, **Bootloader offset = 16 KiB**, **USB** → `make`
+(produces `out/klipper.bin`, which is what Katapult flashes — not the `.uf2`).
+
+**Step 3 — flash Klipper through Katapult** (from `~/klipper`, so the default
+`out/klipper.bin` is picked up):
 ```bash
-# find the Katapult device
-ls /dev/serial/by-id/
+cd ~/klipper
 python3 ~/katapult/scripts/flashtool.py -d /dev/serial/by-id/usb-katapult_rp2040_XXXX-if00
-# or, once Klipper is running, subsequent reflashes:
-python3 ~/katapult/scripts/flash_can.py ...   # (USB variant: flashtool.py -d <serial>)
 ```
+The board reboots into Klipper and now shows up as
+`usb-Klipper_rp2040_XXXX-if00`.
 
-After this, every future update = `make` + `flashtool.py -d <serial>` — **no button.**
+**Later reflashes — no BOOT button.** With Klipper already running, point flashtool at
+the **Klipper** serial and add `-r`: flashtool asks the running MCU to reboot into
+Katapult, then flashes:
+```bash
+cd ~/klipper && make
+python3 ~/katapult/scripts/flashtool.py \
+    -d /dev/serial/by-id/usb-Klipper_rp2040_5303284738FB5E1C-if00 -r
+```
 
 ## Identify the board's serial (critical — 3rd RP2040 on the rig)
 
