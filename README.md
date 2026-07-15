@@ -131,6 +131,15 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the build history.
 
 ---
 
+## Credits
+
+- **Idea, design direction, build and real‑world testing:**
+  [Nitrooxyde](https://github.com/Nitrooxyde)
+- **Engineering legwork, CAD assistance and documentation:**
+  [Claude](https://claude.com/claude-code) (Anthropic) — this project was
+  designed and written in close collaboration with Claude Code, from the
+  face‑by‑face CAD sessions to the docs you're reading.
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE). The BTT SFS 2.0 CAD model referenced in the docs is
