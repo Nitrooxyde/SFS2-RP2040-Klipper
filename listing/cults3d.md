@@ -43,7 +43,7 @@ Ce support monobloc loge un **BigTreeTech Smart Filament Sensor 2.0** et un **Wa
 **Assemblage :** le pico se colle à la **colle chaude aux 4 coins** dans sa cavité (simple, ferme, démontable). Passez les guides PTFE ID2/OD4 jusqu'au fond des ports du SFS (indispensable en poussée).
 
 **⚠️ Câblage : alimentez le SFS en 3,3 V uniquement** (le RP2040 n'est pas tolérant au 5 V). Câblage complet, flash Klipper/Katapult et config prête à l'emploi sur le GitHub :
-👉 **github.com/Nitrooxyde/SFS2-RP2040-Klipper**
+👉 **github.com/Nitrooxyde/BTT-SFS-2.0-RP2040-Zero-Klipper**
 
 **Impression :** ABS/ASA (ou PETG), 0,2 mm, 4 périmètres, 30–40 % de remplissage. Supports uniquement sur les ouvertures selon l'orientation. STL vérifié étanche (59 488 facettes). Encombrement : 69 × 48 × 25 mm.
 
@@ -78,7 +78,7 @@ This one-piece receptacle houses a **BigTreeTech Smart Filament Sensor 2.0** and
 **Assembly:** hot-glue the pico at its **four corners** in the cavity (simple, firm, serviceable). Run the PTFE ID2/OD4 guides all the way into the SFS bore (mandatory when pushing filament).
 
 **⚠️ Wiring: power the SFS at 3.3 V only** (the RP2040 is not 5 V-tolerant). Full wiring, Klipper/Katapult flashing and a ready-to-include config on GitHub:
-👉 **github.com/Nitrooxyde/SFS2-RP2040-Klipper**
+👉 **github.com/Nitrooxyde/BTT-SFS-2.0-RP2040-Zero-Klipper**
 
 **Printing:** ABS/ASA (or PETG), 0.2 mm, 4 walls, 30–40 % infill. Supports only on the openings depending on orientation. STL verified watertight (59,488 facets). Footprint: 69 × 48 × 25 mm.
 

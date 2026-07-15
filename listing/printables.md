@@ -58,7 +58,7 @@ Motion → GP0, switch → GP1, internal pull-ups.
 
 Full wiring guide, Klipper/Katapult flashing steps and a ready-to-include
 `sfs.cfg` are on GitHub:
-**https://github.com/Nitrooxyde/SFS2-RP2040-Klipper**
+**https://github.com/Nitrooxyde/BTT-SFS-2.0-RP2040-Zero-Klipper**
 
 ### BOM
 
